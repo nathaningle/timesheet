@@ -1,0 +1,23 @@
+name:                timesheet
+version:             0.1.0.0
+#synopsis:
+#description:
+#homepage:
+license:             ISC
+author:              Nathan Ingle
+maintainer:          elgni.nahtan@gmail.com
+copyright:           2020 Nathan Ingle
+category:            Text
+
+ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS -split-sections
+
+dependencies:
+  - base >= 4.7 && < 5
+  - attoparsec
+  - text
+  - time
+
+executables:
+  timesheet:
+    source-dirs:      src
+    main:             Main.hs

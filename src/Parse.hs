@@ -1,0 +1,82 @@
+{- |
+Module      : Parse
+Copyright   : 2020 Nathan Ingle
+License     : ISC
+
+Maintainer  : elgni.nahtan@gmail.com
+Stability   : experimental
+Portability : non-portable
+
+Calculate time worked from timesheets.
+-}
+{-# LANGUAGE OverloadedStrings #-}
+module Parse where
+
+import           WorkDay              (DayRecord (..), Interval, TimeOfDay (..),
+                                       Work (..), makeInterval)
+
+import           Control.Applicative  (empty, (<|>))
+import           Control.Monad        (guard)
+import           Data.Attoparsec.Text
+import           Data.Char            (isDigit)
+import           Data.Text            (Text, strip)
+import           Data.Time.Calendar   (Day, fromGregorianValid)
+
+
+-- | Parse @n@ decimal digits to an unsigned number.
+digitCount :: Read a => Int -> Parser a
+digitCount n = read <$> count n (satisfy isDigit)
+
+-- | Skip zero or more spaces and/or horizontal tabs.
+skipHSpace :: Parser ()
+skipHSpace = many' (char ' ' <|> char '\t') *> pure ()
+
+-- | Skip one or more spaces and/or horizontal tabs.
+skipHSpace1 :: Parser ()
+skipHSpace1 = many1 (char ' ' <|> char '\t') *> pure ()
+
+-- | Skip a single colon, if found.
+optionalColon :: Parser ()
+optionalColon = option () $ char ':' *> pure ()
+
+
+date :: Parser Day
+date = do
+  d <- fromGregorianValid <$> digitCount 4 <*> (char '-' *> digitCount 2) <*> (char '-' *> digitCount 2)
+  case d of
+    Just d' -> pure d'
+    Nothing -> empty
+
+time :: Parser TimeOfDay
+time = do
+  h <- hoursReg <|> hoursAlt
+  m <- digitCount 2
+  let mins = (h * 60) + m
+      allDay = h == 24 && m == 0
+  guard $ allDay || (h <= 24 && m < 60 && mins < 1440)
+  pure $ TimeOfDay mins
+  where
+    hoursReg = digitCount 2 <* optionalColon
+    hoursAlt = digitCount 1 <* char ':'
+
+interval :: Parser Interval
+interval = do
+  i <- makeInterval <$> time <*> (skipHSpace1 *> time)
+  case i of
+    Just i' -> pure i'
+    Nothing -> empty
+
+comment :: Parser Text
+comment = strip <$> (char '#' *> takeTill isEndOfLine)
+
+spaceThenWork :: Parser Work
+spaceThenWork = toil <|> leave <|> training <|> work
+  where
+    toil     = TOIL     <$ (skipHSpace1 *> "TOIL"     *> takeTill isEndOfLine)
+    leave    = Leave    <$ (skipHSpace1 *> "Leave"    *> takeTill isEndOfLine)
+    training = Training <$ (skipHSpace1 *> "Training" *> takeTill isEndOfLine)
+    work = Work <$> many1' (skipHSpace1 *> interval)
+
+dayRecord :: Parser DayRecord
+dayRecord = DayRecord <$> date <*> spaceThenWork <*> optionalComment
+  where optionalComment = skipHSpace *> option Nothing (Just <$> comment)

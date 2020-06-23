@@ -1,0 +1,4 @@
+.*.swp
+/.ghc.environment.*
+/dist/
+/dist-newstyle/
