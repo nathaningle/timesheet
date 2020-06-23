@@ -19,6 +19,7 @@ import           Control.Applicative  (empty, (<|>))
 import           Control.Monad        (guard)
 import           Data.Attoparsec.Text
 import           Data.Char            (isDigit)
+import           Data.Maybe           (catMaybes)
 import           Data.Text            (Text, strip)
 import           Data.Time.Calendar   (Day, fromGregorianValid)
 
@@ -80,3 +81,13 @@ spaceThenWork = toil <|> leave <|> training <|> work
 dayRecord :: Parser DayRecord
 dayRecord = DayRecord <$> date <*> spaceThenWork <*> optionalComment
   where optionalComment = skipHSpace *> option Nothing (Just <$> comment)
+
+parseLine :: Parser (Maybe DayRecord)
+parseLine = emptyLine <|> commentLine <|> dayRecordLine
+  where
+    emptyLine = Nothing <$ (skipHSpace *> endOfLine)
+    commentLine = Nothing <$ (skipHSpace *> char '#' *> takeTill isEndOfLine *> endOfLine)
+    dayRecordLine = Just <$> (dayRecord <* endOfLine)
+
+parseLines :: Parser [DayRecord]
+parseLines = catMaybes <$> many' parseLine
