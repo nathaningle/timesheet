@@ -68,14 +68,15 @@ interval = do
     Nothing -> empty
 
 comment :: Parser Text
-comment = strip <$> (char '#' *> takeTill isEndOfLine)
+comment = strip <$> (many1 commentStartChar *> takeTill isEndOfLine)
+  where commentStartChar = char '#' <|> char '-'
 
 spaceThenWork :: Parser Work
 spaceThenWork = toil <|> leave <|> training <|> work
   where
-    toil     = TOIL     <$ (skipHSpace1 *> "TOIL"     *> takeTill isEndOfLine)
-    leave    = Leave    <$ (skipHSpace1 *> "Leave"    *> takeTill isEndOfLine)
-    training = Training <$ (skipHSpace1 *> "Training" *> takeTill isEndOfLine)
+    toil     = TOIL     <$ (skipHSpace1 *> asciiCI "toil")
+    leave    = Leave    <$ (skipHSpace1 *> asciiCI "leave")
+    training = Training <$ (skipHSpace1 *> asciiCI "training")
     work = Work <$> many1' (skipHSpace1 *> interval)
 
 dayRecord :: Parser DayRecord
