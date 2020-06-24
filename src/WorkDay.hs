@@ -91,7 +91,7 @@ workBalance w = workMinutes w - scheduledMinutes w
 
 -- | Format a 'Work' for pretty-printing.
 ppWork :: Work -> Text
-ppWork w@(Work intvls) = T.pack $ printf "%-54s  |  %.2f (%2d:%02d) [%6.2f]" inOuts hDec hours mins balHDec
+ppWork w@(Work intvls) = T.pack $ printf "%-54s  |  %5.2f (%2d:%02d) [%6.2f]" inOuts hDec hours mins balHDec
   where
     inOuts = T.intercalate "  " $ map ppInterval intvls
     hDec = (fromIntegral (workMinutes w)) / 60.0 :: Double
@@ -115,3 +115,18 @@ dayBalance = workBalance . drWork
 -- | Format a 'DayRecord' for pretty-printing.
 ppDayRecord :: DayRecord -> Text
 ppDayRecord DayRecord{..} = T.pack (show drDay) <> "  |  " <> ppWork drWork <> maybe "" ("  " <>) drComment
+
+-- | Given an initial balance, calculate the final balance.
+tallyMinutes :: Int -> [DayRecord] -> Int
+tallyMinutes = foldr f
+  where f DayRecord{..} bal = bal + workBalance drWork
+
+-- | Format a balance in minutes for pretty-printing.
+ppBalance :: Int -> Text
+ppBalance bal
+  | bal == 0  = "zero"
+  | bal > 0   = hhmm <> " in credit"
+  | otherwise = hhmm <> " in deficit"
+  where
+    (h, m) = abs bal `quotRem` 60
+    hhmm = T.pack $ printf "%d:%02d" h m
