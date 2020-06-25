@@ -13,7 +13,7 @@ Calculate time worked from timesheets.
 module Main where
 
 import           Parse                (parseLines)
-import           WorkDay              (ppBalance, ppDayRecord, tallyMinutes)
+import           WorkDay              (ppBalance, ppWorkDay, tallyMinutes)
 
 import           Data.Attoparsec.Text (endOfInput, parseOnly)
 import qualified Data.Text.IO         as TIO
@@ -25,6 +25,6 @@ main = do
   case parseOnly (parseLines <* endOfInput) input of
     Left err   -> error err
     Right recs -> do
-      mapM_ (TIO.putStrLn . ppDayRecord) recs
+      mapM_ (TIO.putStrLn . ppWorkDay) recs
       putStrLn $ replicate 79 '='
       TIO.putStrLn $ "Balance is " <> ppBalance (tallyMinutes 0 recs) <> "."

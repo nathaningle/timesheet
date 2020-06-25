@@ -12,8 +12,8 @@ Calculate time worked from timesheets.
 {-# LANGUAGE OverloadedStrings #-}
 module Parse where
 
-import           WorkDay              (DayRecord (..), Interval, TimeOfDay (..),
-                                       Work (..), makeInterval)
+import           WorkDay              (Interval, TimeOfDay (..), Work (..),
+                                       WorkDay (..), makeInterval)
 
 import           Control.Applicative  (empty, (<|>))
 import           Control.Monad        (guard)
@@ -79,16 +79,16 @@ spaceThenWork = toil <|> leave <|> training <|> work
     training = Training <$ (skipHSpace1 *> asciiCI "training")
     work = Work <$> many1' (skipHSpace1 *> interval)
 
-dayRecord :: Parser DayRecord
-dayRecord = DayRecord <$> date <*> spaceThenWork <*> optionalComment
+dayRecord :: Parser WorkDay
+dayRecord = WorkDay <$> date <*> spaceThenWork <*> optionalComment
   where optionalComment = skipHSpace *> option Nothing (Just <$> comment)
 
-parseLine :: Parser (Maybe DayRecord)
+parseLine :: Parser (Maybe WorkDay)
 parseLine = emptyLine <|> commentLine <|> dayRecordLine
   where
     emptyLine = Nothing <$ (skipHSpace *> endOfLine)
     commentLine = Nothing <$ (skipHSpace *> char '#' *> takeTill isEndOfLine *> endOfLine)
     dayRecordLine = Just <$> (dayRecord <* endOfLine)
 
-parseLines :: Parser [DayRecord]
+parseLines :: Parser [WorkDay]
 parseLines = catMaybes <$> many' parseLine

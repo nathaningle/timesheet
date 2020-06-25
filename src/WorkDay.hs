@@ -103,23 +103,23 @@ ppWork Leave         = "Leave                                                   
 
 
 -- | A complete record of a working day.
-data DayRecord = DayRecord { drDay     :: Day
-                           , drWork    :: Work
-                           , drComment :: Maybe Text
-                           } deriving (Eq, Ord, Show)
+data WorkDay = WorkDay { wdDay     :: Day
+                       , wdWork    :: Work
+                       , wdComment :: Maybe Text
+                       } deriving (Eq, Ord, Show)
 
 -- | Calculate the balance of minutes worked versus scheduled.
-dayBalance :: DayRecord -> Int
-dayBalance = workBalance . drWork
+dayBalance :: WorkDay -> Int
+dayBalance = workBalance . wdWork
 
--- | Format a 'DayRecord' for pretty-printing.
-ppDayRecord :: DayRecord -> Text
-ppDayRecord DayRecord{..} = T.pack (show drDay) <> "  |  " <> ppWork drWork <> maybe "" ("  " <>) drComment
+-- | Format a 'WorkDay' for pretty-printing.
+ppWorkDay :: WorkDay -> Text
+ppWorkDay WorkDay{..} = T.pack (show wdDay) <> "  |  " <> ppWork wdWork <> maybe "" ("  " <>) wdComment
 
 -- | Given an initial balance, calculate the final balance.
-tallyMinutes :: Int -> [DayRecord] -> Int
+tallyMinutes :: Int -> [WorkDay] -> Int
 tallyMinutes = foldr f
-  where f DayRecord{..} bal = bal + workBalance drWork
+  where f WorkDay{..} bal = bal + workBalance wdWork
 
 -- | Format a balance in minutes for pretty-printing.
 ppBalance :: Int -> Text
