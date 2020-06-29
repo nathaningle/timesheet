@@ -18,6 +18,7 @@ executable timesheet
   main-is: Main.hs
   other-modules:
       Parse
+      Validate
       WorkDay
       Paths_timesheet
   hs-source-dirs:
@@ -26,6 +27,7 @@ executable timesheet
   build-depends:
       attoparsec
     , base >=4.7 && <5
+    , mtl
     , text
     , time
   default-language: Haskell2010

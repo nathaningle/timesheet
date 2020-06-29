@@ -59,6 +59,14 @@ makeInterval (TimeOfDay t1) (TimeOfDay t2)
 duration :: Interval -> Int
 duration (Interval t1 t2) = t2 `minutesDiff` t1
 
+-- | Minutes between the end of one 'Interval' and the start of another.
+minutesBetween :: Interval -> Interval -> Int
+minutesBetween (Interval _ t1) (Interval t2 _) = t1 `minutesDiff` t2
+
+-- | Coalesce two 'Interval's.
+joinInterval :: Interval -> Interval -> Interval
+joinInterval (Interval t1 _) (Interval _ t2) = Interval t1 t2
+
 -- | Format an 'Interval' for pretty-printing.
 ppInterval :: Interval -> Text
 ppInterval (Interval tod1 tod2) = ppTimeOfDay tod1 <> "  " <> ppTimeOfDay tod2

@@ -14,6 +14,7 @@ ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS -sp
 dependencies:
   - base >= 4.7 && < 5
   - attoparsec
+  - mtl
   - text
   - time
 
