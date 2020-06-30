@@ -13,6 +13,8 @@ Calculate time worked from timesheets.
 {-# LANGUAGE RecordWildCards   #-}
 module WorkDay where
 
+import           Data.Char          (isDigit)
+import           Data.String        (IsString (..))
 import           Data.Text          (Text)
 import qualified Data.Text          as T
 import           Data.Time.Calendar (Day)
@@ -33,6 +35,13 @@ ppInt x
 
 -- | Time of some day represented as minutes since midnight.
 newtype TimeOfDay = TimeOfDay Int deriving (Eq, Ord, Show)
+
+-- | This instance is for convenience during testing.  It doesn't do any
+-- validation.
+instance IsString TimeOfDay where
+  fromString s = TimeOfDay $ read hh * 60 + read mm
+    where
+      (hh, mm) = tail <$> span isDigit s
 
 -- | Minutes between two 'TimeOfDay's.  This is used like the @-@ operator; iff
 -- the first argument is less than the second then the result will be negative.
