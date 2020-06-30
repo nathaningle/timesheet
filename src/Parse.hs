@@ -15,10 +15,11 @@ module Parse where
 import           WorkDay              (Interval, TimeOfDay (..), Work (..),
                                        WorkDay (..), makeInterval)
 
-import           Control.Applicative  (empty, (<|>))
+import           Control.Applicative  (empty, optional, (<|>))
 import           Control.Monad        (guard)
 import           Data.Attoparsec.Text
 import           Data.Char            (isDigit)
+import           Data.Functor         (($>))
 import           Data.Maybe           (catMaybes)
 import           Data.Text            (Text, strip)
 import           Data.Time.Calendar   (Day, fromGregorianValid)
@@ -30,23 +31,21 @@ digitCount n = read <$> count n (satisfy isDigit)
 
 -- | Skip zero or more spaces and/or horizontal tabs.
 skipHSpace :: Parser ()
-skipHSpace = many' (char ' ' <|> char '\t') *> pure ()
+skipHSpace = many' (char ' ' <|> char '\t') $> ()
 
 -- | Skip one or more spaces and/or horizontal tabs.
 skipHSpace1 :: Parser ()
-skipHSpace1 = many1 (char ' ' <|> char '\t') *> pure ()
+skipHSpace1 = many1 (char ' ' <|> char '\t') $> ()
 
 -- | Skip a single colon, if found.
 optionalColon :: Parser ()
-optionalColon = option () $ char ':' *> pure ()
+optionalColon = option () (char ':' $> ())
 
 
 date :: Parser Day
 date = do
   d <- fromGregorianValid <$> digitCount 4 <*> (char '-' *> digitCount 2) <*> (char '-' *> digitCount 2)
-  case d of
-    Just d' -> pure d'
-    Nothing -> empty
+  maybe empty pure d
 
 time :: Parser TimeOfDay
 time = do
@@ -63,9 +62,7 @@ time = do
 interval :: Parser Interval
 interval = do
   i <- makeInterval <$> time <*> (skipHSpace1 *> time)
-  case i of
-    Just i' -> pure i'
-    Nothing -> empty
+  maybe empty pure i
 
 comment :: Parser Text
 comment = strip <$> (many1 commentStartChar *> takeTill isEndOfLine)
@@ -80,8 +77,7 @@ spaceThenWork = toil <|> leave <|> training <|> work
     work = Work <$> many1' (skipHSpace1 *> interval)
 
 dayRecord :: Parser WorkDay
-dayRecord = WorkDay <$> date <*> spaceThenWork <*> optionalComment
-  where optionalComment = skipHSpace *> option Nothing (Just <$> comment)
+dayRecord = WorkDay <$> date <*> spaceThenWork <*> (skipHSpace *> optional comment)
 
 parseLine :: Parser (Maybe WorkDay)
 parseLine = emptyLine <|> commentLine <|> dayRecordLine

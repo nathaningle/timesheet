@@ -111,9 +111,9 @@ ppWork :: Work -> Text
 ppWork w@(Work intvls) = T.pack $ printf "%-54s  |  %5.2f (%2d:%02d) [%6.2f]" inOuts hDec hours mins balHDec
   where
     inOuts = T.intercalate "  " $ map ppInterval intvls
-    hDec = (fromIntegral (workMinutes w)) / 60.0 :: Double
-    (hours, mins) = (workMinutes w) `divMod` 60
-    balHDec = (fromIntegral (workBalance w)) / 60.0 :: Double
+    hDec = fromIntegral (workMinutes w) / 60.0 :: Double
+    (hours, mins) = workMinutes w `divMod` 60
+    balHDec = fromIntegral (workBalance w) / 60.0 :: Double
 ppWork TOIL          = "TOIL                                                    |   0.00 ( 0:00) [ -7.50]"
 ppWork Training      = "Training                                                |   7.50 ( 7:30) [  0.00]"
 ppWork Leave         = "Leave                                                   |   0.00 ( 0:00) [  0.00]"
