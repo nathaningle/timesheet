@@ -1,5 +1,5 @@
 {- |
-Module      : Main
+File        : timesheet.hs
 Copyright   : 2020 Nathan Ingle
 License     : ISC
 

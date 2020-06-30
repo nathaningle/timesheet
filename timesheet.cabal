@@ -14,12 +14,12 @@ license:        ISC
 license-file:   LICENSE
 build-type:     Simple
 
-executable timesheet
-  main-is: Main.hs
-  other-modules:
+library
+  exposed-modules:
       Parse
       Validate
       WorkDay
+  other-modules:
       Paths_timesheet
   hs-source-dirs:
       src
@@ -30,4 +30,38 @@ executable timesheet
     , mtl
     , text
     , time
+  default-language: Haskell2010
+
+executable timesheet
+  main-is: timesheet.hs
+  other-modules:
+      Paths_timesheet
+  ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS -split-sections
+  build-depends:
+      attoparsec
+    , base >=4.7 && <5
+    , mtl
+    , text
+    , time
+    , timesheet
+  default-language: Haskell2010
+
+test-suite test
+  type: exitcode-stdio-1.0
+  main-is: test.hs
+  other-modules:
+      WorkDay.Test
+      Paths_timesheet
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS -split-sections
+  build-depends:
+      attoparsec
+    , base >=4.7 && <5
+    , mtl
+    , tasty
+    , tasty-hunit
+    , text
+    , time
+    , timesheet
   default-language: Haskell2010

@@ -18,7 +18,24 @@ dependencies:
   - text
   - time
 
+library:
+  source-dirs:      src
+  exposed-modules:
+    - Parse
+    - Validate
+    - WorkDay
+
 executables:
   timesheet:
-    source-dirs:      src
-    main:             Main.hs
+    main:             timesheet.hs
+    dependencies:
+      - timesheet
+
+tests:
+  test:
+    source-dirs:      test
+    main:             test.hs
+    dependencies:
+      - timesheet
+      - tasty
+      - tasty-hunit

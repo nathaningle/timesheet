@@ -61,11 +61,11 @@ duration (Interval t1 t2) = t2 `minutesDiff` t1
 
 -- | Minutes between the end of one 'Interval' and the start of another.
 minutesBetween :: Interval -> Interval -> Int
-minutesBetween (Interval _ t1) (Interval t2 _) = t1 `minutesDiff` t2
+minutesBetween (Interval _ t1) (Interval t2 _) = t2 `minutesDiff` t1
 
 -- | Coalesce two 'Interval's.
 joinInterval :: Interval -> Interval -> Interval
-joinInterval (Interval t1 _) (Interval _ t2) = Interval t1 t2
+joinInterval (Interval a1 b1) (Interval a2 b2) = Interval (min a1 a2) (max b1 b2)
 
 -- | Format an 'Interval' for pretty-printing.
 ppInterval :: Interval -> Text
@@ -83,14 +83,14 @@ data Work = Work [Interval]
 workMinutes :: Work -> Int
 workMinutes (Work intvls) = sum (map duration intvls)
 workMinutes TOIL          = 0
-workMinutes Training      = 0
+workMinutes Training      = regulationMinutes
 workMinutes Leave         = 0
 
 -- | Minutes scheduled for this type of work day.
 scheduledMinutes :: Work -> Int
 scheduledMinutes (Work _) = regulationMinutes
 scheduledMinutes TOIL     = regulationMinutes
-scheduledMinutes Training = 0
+scheduledMinutes Training = regulationMinutes
 scheduledMinutes Leave    = 0
 
 -- | Calculate the balance of minutes worked versus scheduled.
