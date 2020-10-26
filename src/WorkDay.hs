@@ -17,7 +17,7 @@ import           Data.Char          (isDigit)
 import           Data.String        (IsString (..))
 import           Data.Text          (Text)
 import qualified Data.Text          as T
-import           Data.Time.Calendar (Day)
+import           Data.Time.Calendar (Day, fromGregorian)
 import           Text.Printf        (printf)
 
 
@@ -147,3 +147,21 @@ ppBalance bal
   where
     (h, m) = abs bal `quotRem` 60
     hhmm = T.pack $ printf "%d:%02d" h m
+
+
+-- | The "Shortcut method" for calculating expenses relating to working from
+-- home is applicable over the period 1 March to 30 June 2020 (then again over
+-- 1 July to 30 December).
+--
+-- https://www.ato.gov.au/individuals/income-and-deductions/deductions-you-can-claim/home-office-expenses/#Shortcutmethod
+isCovidDay2020 :: WorkDay -> Bool
+isCovidDay2020 WorkDay{..} = wdDay >= march1 && wdDay <= june30
+  where
+    march1 = fromGregorian 2020 3 1
+    june30 = fromGregorian 2020 6 30
+
+-- | Use the comments to determine which days were worked from home.
+isHomeDay :: WorkDay -> Bool
+isHomeDay WorkDay{..} = case wdComment of
+  Nothing -> False
+  Just comment -> "work from home" `T.isInfixOf` comment

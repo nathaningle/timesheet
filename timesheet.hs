@@ -13,9 +13,10 @@ Calculate time worked from timesheets.
 module Main where
 
 import           Parse                (parseLines)
-import           WorkDay              (ppBalance, ppWorkDay, tallyMinutes)
+import           WorkDay              (WorkDay(wdWork), ppWorkDay, isCovidDay2020, isHomeDay, workMinutes)
 
 import           Data.Attoparsec.Text (endOfInput, parseOnly)
+import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
 
 
@@ -25,6 +26,9 @@ main = do
   case parseOnly (parseLines <* endOfInput) input of
     Left err   -> error err
     Right recs -> do
-      mapM_ (TIO.putStrLn . ppWorkDay) recs
+      let recs' = filter (\r -> isCovidDay2020 r && isHomeDay r) recs
+          homeMins = sum $ map (workMinutes . wdWork) recs'
+          homeHours = fromIntegral homeMins / 60.0 :: Double
+      mapM_ (TIO.putStrLn . ppWorkDay) recs'
       putStrLn $ replicate 79 '='
-      TIO.putStrLn $ "Balance is " <> ppBalance (tallyMinutes 0 recs) <> "."
+      TIO.putStrLn $ "Hours worked from home between 1 March and 30 June 2020: " <> T.pack (show homeHours)
