@@ -23,7 +23,7 @@ library
       Paths_timesheet
   hs-source-dirs:
       src
-  ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS -split-sections
+  ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS
   build-depends:
       attoparsec
     , base >=4.7 && <5
@@ -36,7 +36,7 @@ executable timesheet
   main-is: timesheet.hs
   other-modules:
       Paths_timesheet
-  ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS -split-sections
+  ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS
   build-depends:
       attoparsec
     , base >=4.7 && <5
@@ -54,7 +54,7 @@ test-suite test
       Paths_timesheet
   hs-source-dirs:
       test
-  ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS -split-sections
+  ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS
   build-depends:
       attoparsec
     , base >=4.7 && <5

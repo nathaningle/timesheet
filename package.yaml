@@ -9,7 +9,7 @@ maintainer:          elgni.nahtan@gmail.com
 copyright:           2020 Nathan Ingle
 category:            Text
 
-ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS -split-sections
+ghc-options: -Wall -Werror -O2 -Wnoncanonical-monad-instances +RTS -M3G -RTS
 
 dependencies:
   - base >= 4.7 && < 5

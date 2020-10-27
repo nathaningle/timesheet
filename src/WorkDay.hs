@@ -163,5 +163,5 @@ isCovidDay2020 WorkDay{..} = wdDay >= march1 && wdDay <= june30
 -- | Use the comments to determine which days were worked from home.
 isHomeDay :: WorkDay -> Bool
 isHomeDay WorkDay{..} = case wdComment of
-  Nothing -> False
+  Nothing      -> False
   Just comment -> "work from home" `T.isInfixOf` comment

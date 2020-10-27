@@ -13,7 +13,8 @@ Calculate time worked from timesheets.
 module Main where
 
 import           Parse                (parseLines)
-import           WorkDay              (WorkDay(wdWork), ppWorkDay, isCovidDay2020, isHomeDay, workMinutes)
+import           WorkDay              (WorkDay (wdWork), isCovidDay2020,
+                                       isHomeDay, ppWorkDay, workMinutes)
 
 import           Data.Attoparsec.Text (endOfInput, parseOnly)
 import qualified Data.Text            as T

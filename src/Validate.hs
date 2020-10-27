@@ -15,7 +15,6 @@ module Validate where
 
 import           WorkDay
 
-import           Control.Monad        (when)
 import           Control.Monad.State
 import           Control.Monad.Writer
 import           Data.Time.Calendar   (Day)
